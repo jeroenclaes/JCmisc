@@ -14,7 +14,7 @@ n.levels<-length(levels(model@frame[,fixed.effect]))
   stop<-n.levels-1
   for(x in 1:stop)
   {
-    column.name<-paste(random, fixed.effect, "S", levels(model@frame[,fixed.effect])[x],"", sep=".", collapse=".")
+    column.name<-paste(random.effect, fixed.effect, "S", levels(model@frame[,fixed.effect])[x],"", sep=".", collapse=".")
     f[, levels(model@frame[,fixed.effect])[x]]<-f[, column.name]
     
   }
