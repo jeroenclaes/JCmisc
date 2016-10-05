@@ -1,4 +1,4 @@
-
+# from party package. This version of the function allows controlling the font size and font family of the plot
 # $Id$
 
 ## utility functions for querying the number of
