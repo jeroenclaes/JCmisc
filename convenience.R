@@ -1,27 +1,6 @@
 #Convenience function to load data, set working directory and contrasts
 
-prep <- function()
-{
-require(lme4)
-require(coefplot)
-require(Hmisc)
-require(party)
-require(car)
-  options(contrasts = c("contr.Sum", "contr.Poly"))
-	setwd("~/Desktop/")	
-	
-datalh <<- read.csv2("/Users/jeroenclaes/Box Sync/Doctorado/Corpus_LH/LHrecoded.csv", header=TRUE)
-datasj<<-read.csv2("/Users/jeroenclaes/Box Sync/Doctorado/Corpus_PR/PRrecoded.csv", header=TRUE)	
-datasd<<-read.csv2("/Users/jeroenclaes/Box Sync/Doctorado/Corpus_RD/RDrecoded.csv", header=TRUE)
-	
-datalh$Tense<<-recode(datalh$Tense, '"All.others"="All.Others"')
-
-
-
-
-}
-
-varimp_plot <-function(varimp, varimp1, varimp2, filename, height=9)
+varimpPlot <-function(varimp, varimp1, varimp2, filename, height=9)
 {
 require(lattice)
 require(latticeExtra)
@@ -150,7 +129,7 @@ require(gridExtra)
 png(file=filename, width=width, height=height, units="cm",  pointsize=20, bg="transparent",  res=300);trellis.par.set(fontfamily="Times");trellis.par.set(fonsize=12);trellis.par.set(axis.text=list(cex=1.4));trellis.par.set(key.text=list(cex=1.4));print(plot);dev.off()
 }
 
-topng<-function(plot, width=200, height=100, pointsize=20)
+toPng<-function(plot, width=200, height=100, pointsize=20)
 {
   png(file="plot.png", width=width, height=height, units="mm",  pointsize=pointsize, bg="transparent",  res=300)
   par(mar = c(0, 0,0,0))
@@ -272,7 +251,7 @@ overdisp_fun <- function(model) {
 #Convenience function to print model summary for glmer, glm, and ctree 
 #Includes C, Somer's Dxy, R2, and %correctly classified
 
-sum_stats<- function(model)
+sumStats<- function(model)
 {
 if(!require("Hmisc")){
     supressMessages(install.packages("Hmisc"))
