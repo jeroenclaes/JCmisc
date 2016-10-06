@@ -1,16 +1,16 @@
-# from party package. This version of the function allows controlling the font size and font family of the plot
-# $Id$
+
+#These functions were pulled from the Party repository. I added the options for setting font size and family, and I tweaked the appearance of the labels on the branches. 
 
 ## utility functions for querying the number of
 ## terminal nodes and the maximal depth of (sub-)trees
-nterminal <- function(node,  fontfamily= "DG Meta Science", fontsize=8) {
+nterminal <- function(node) {
   if (node$terminal) return(1)
   nl <- nterminal(node$left)
   nr <- nterminal(node$right)
   return(nl + nr)
 }
 
-maxdepth <- function(node, fontfamily= "DG Meta Science", fontsize=8) {
+maxdepth <- function(node) {
   if (node$terminal) return(1)
   nl <- maxdepth(node$left)
   nr <- maxdepth(node$right)
@@ -45,7 +45,7 @@ node_inner <- function(ctreeobj,
   }
   
   maxstr <- function(node) {
-    lab <- getLabel1(node)
+    lab <-  getLabel1(node)
     msl <- ifelse(node$terminal, "", maxstr(node$left))
     msr <- ifelse(node$terminal, "", maxstr(node$right))
     lab <- c(lab, msl, msr)
@@ -74,7 +74,7 @@ node_inner <- function(ctreeobj,
     
     grid.polygon(x = unit(c(xell, rev(xell)), "npc"),
                  y = unit(c(yell, -yell)+0.5, "npc"),
-                 gp = gpar(fill = fill[1], fontfamily="DG Meta Science", fontsize=8))
+                 gp = gpar(fill = fill[1], fontfamily=fontfamily, fontsize=fontsize-2))
     grid.text(lab[1], y = unit(1.5 + 0.5 * pval, "lines"))
     if(pval) grid.text(lab[2], y = unit(1, "lines"))
     
@@ -83,7 +83,7 @@ node_inner <- function(ctreeobj,
                            width = max(unit(1, "lines"), unit(1.3, "strwidth", as.character(node$nodeID))),
                            height = max(unit(1, "lines"), unit(1.3, "strheight", as.character(node$nodeID))))
       pushViewport(nodeIDvp)
-      grid.rect(gp = gpar(fill = fill[2], fontfamily="DG Meta Science", fontsize=8))
+      grid.rect(gp = gpar(fill = fill[2], fontfamily=fontfamily, fontsize=fontsize))
       grid.text(node$nodeID)
       popViewport()
     }
@@ -120,7 +120,7 @@ node_surv <- function(ctreeobj, fontfamily= "DG Meta Science", fontsize=8,
                        name = paste("node_surv", node$nodeID, sep = ""))
     
     pushViewport(top_vp)
-    grid.rect(gp = gpar(fill = "white", col = 0),  fontfamily="DG Meta Science", fontsize=8)
+    grid.rect(gp = gpar(fill = "white", col = 0),  fontfamily=fontfamily, fontsize=fontsize)
     
     ## main title
     top <- viewport(layout.pos.col=2, layout.pos.row=1)
@@ -139,7 +139,7 @@ node_surv <- function(ctreeobj, fontfamily= "DG Meta Science", fontsize=8,
     grid.lines(a$x/max(survobj[,1]), a$y)
     grid.xaxis()
     grid.yaxis()
-    grid.rect(gp = gpar(fill = "transparent",  fontfamily="DG Meta Science", fontsize=8))
+    grid.rect(gp = gpar(fill = "transparent",  fontfamily=fontfamily, fontsize=fontsize))
     upViewport(2)
   }
   
@@ -253,16 +253,16 @@ node_barplot <- function(ctreeobj,
       }
       if(np > 1) {
         grid.text(ylevels[1], x = unit(-1, "lines"), y = 0,
-                  just = c("left", "center"), rot = 90,
-                  default.units = "native", check.overlap = TRUE)
+                 just = c("left", "center"), rot = 90,
+                 default.units = "native", check.overlap = TRUE)
         grid.text(ylevels[np], x = unit(-1, "lines"), y = ymax,
-                  just = c("right", "center"), rot = 90,
-                  default.units = "native", check.overlap = TRUE)
+                just = c("right", "center"), rot = 90,
+                default.units = "native", check.overlap = TRUE)
       }
       if(np > 2) {
-        grid.text(ylevels[-c(1,np)], x = unit(-1, "lines"), y = ycenter[-c(1,np)],
-                  just = "center", rot = 90,
-                  default.units = "native", check.overlap = TRUE)
+       grid.text(ylevels[-c(1,np)], x = unit(-1, "lines"), y = ycenter[-c(1,np)],
+                 just = "center", rot = 90,
+                 default.units = "native", check.overlap = TRUE)
       }
       grid.yaxis(main = FALSE)	
     }
@@ -641,9 +641,10 @@ edge_simple <- function(treeobj, digits = 3, abbreviate = FALSE, fontfamily= "DG
       if (left) split <- as.expression(bquote(phantom(0) <= .(split)))
       else split <- as.expression(bquote(phantom(0) > .(split)))
     }
-    grid.rect(gp = gpar(fill = "white", col = 0,  fontfamily=fontfamily, fontsize=fontsize), 
-              width = unit(1, "strwidth", split)) 
-    grid.text(split, just = "center")
+    grid.rect(gp = gpar(fill = "white", col = 0,  fontfamily=fontfamily, fontsize=fontsize-2), 
+              width = unit(1, "strwidth", gsub("Non\n", "Non-", gsub("-", "\n", split))), 
+    height=unit(1,"strheight",  gsub("Non\n", "Non-", gsub("-", "\n", split))))
+    grid.text(gsub("Non\n", "Non-", gsub("-", "\n", split)), just = "center", gp=gpar(fontsize=fontsize-2))
   }
 }
 class(edge_simple) <- "grapcon_generator"
@@ -724,7 +725,7 @@ plotTree <- function(node, xlim, ylim, nx, ny,
                     name = paste("Node", node$nodeID, sep = ""))
   pushViewport(in_vp)
   if (debug)
-    grid.rect(gp = gpar(lty = "dotted",fontfamily="DG Meta Science", fontsize=8))
+    grid.rect(gp = gpar(lty = "dotted",fontfamily=fontfamily, fontsize=fontsize))
   inner_panel(node)
   upViewport()
   
@@ -777,7 +778,7 @@ plotTree <- function(node, xlim, ylim, nx, ny,
                      name =  paste("rEdge", node$nodeID, sep = ""))
   pushViewport(rsp_vp) 
   if (debug)
-    grid.rect(gp = gpar(lty = "dotted", col = 2, fontfamily="DG Meta Science", fontsize=8))
+    grid.rect(gp = gpar(lty = "dotted", col = 2, fontfamily=fontfamily, fontsize=fontsze))
   edge_panel(split, ordered = ps$ordered, left = FALSE)
   upViewport()
   
@@ -797,7 +798,7 @@ plot.BinaryTree <- function(x, main = NULL, type = c("extended", "simple"),
                             drop_terminal = (type[1] == "extended"),
                             tnex = (type[1] == "extended") + 1, 
                             newpage = TRUE,
-                            pop = TRUE, fontfamily= NULL, fontsize=NULL, file="file.tiff",
+                            pop = TRUE, fontfamily= "DG Meta Science", fontsize=8,
                             ...) {
   
   ### plot BinaryTree objects
