@@ -1,5 +1,11 @@
 
-#These functions were pulled from the Party repository. I added the options for setting font size and family, and I tweaked the appearance of the labels on the branches. 
+#These functions were pulled from the Party github repository. I changed the following things:
+
+#Added options for setting font size and family.
+#Tweaked the appearance of the labels on the branches so they break into new lines on "-", and ",". 
+#For splits with more than 3 levels, the labels on the branches only display the first two, followed by '+ X more', so as not to clutter the plot with uninterpretable labels.
+#I removed the counts of the tokens in the terminal nodes. Again, to simplify the plots and make overlapping labels somewhat less likely.
+
 
 ## utility functions for querying the number of
 ## terminal nodes and the maximal depth of (sub-)trees
@@ -217,8 +223,9 @@ node_barplot <- function(ctreeobj,
     ## main title
     top <- viewport(layout.pos.col=2, layout.pos.row=1)
     pushViewport(top)
-    mainlab <- paste(ifelse(id, paste("Node", node$nodeID, "(n = "), "n = "),
-                     sum(node$weights), ifelse(id, ")", ""), sep = "")
+    #mainlab <- paste(ifelse(id, paste("Node", node$nodeID, "(n = "), "n = "),sum(node$weights), ifelse(id, ")", ""), sep = "")
+    mainlab <- paste(ifelse(id, paste("Node", node$nodeID)))
+    
     grid.text(mainlab)
     popViewport()
     
@@ -632,8 +639,8 @@ edge_simple <- function(treeobj, digits = 3, abbreviate = FALSE, fontfamily= "DG
     
     if (!ordered) {
       if (length(split) > 1) 
-        split <- paste("{", paste(split, collapse = ", "), 
-                       "}", sep="")
+        split <- paste("", paste(split, collapse = ", "), 
+                       "", sep="")
     } else {
       ### <FIXME> phantom and . functions cannot be found by
       ###         codetools
@@ -641,10 +648,30 @@ edge_simple <- function(treeobj, digits = 3, abbreviate = FALSE, fontfamily= "DG
       if (left) split <- as.expression(bquote(phantom(0) <= .(split)))
       else split <- as.expression(bquote(phantom(0) > .(split)))
     }
+    
+    
+
+   if(length(strsplit(as.character(split), ",")[[1]])>3) 
+   {
+    split.labels<-gsub("\\}", "", gsub("\\{", "", gsub("Non\n", "Non-", gsub("-", "\n", split))))
+    split.labels<-paste(strsplit(as.character(split), ",")[[1]][1:2], sep="", collapse=",")
+    split.labels<-paste0(split.labels, "\n+", length(strsplit(as.character(split), ",")[[1]])-2, " more", sep="", collapse="")
+ 
+    
     grid.rect(gp = gpar(fill = "white", col = 0,  fontfamily=fontfamily, fontsize=fontsize-2), 
-              width = unit(1, "strwidth", gsub("Non\n", "Non-", gsub("-", "\n", split))), 
-    height=unit(1,"strheight",  gsub("Non\n", "Non-", gsub("-", "\n", split))))
+              width = unit(1, "strwidth", split.labels), 
+              height=unit(1,"strheight",  split.labels))
+    
+     
+     grid.text(split.labels, just = "center", gp=gpar(fontsize=fontsize-2)) 
+   }
+    else
+    {
+      grid.rect(gp = gpar(fill = "white", col = 0,  fontfamily=fontfamily, fontsize=fontsize-2), 
+                width = unit(1, "strwidth", gsub("Non\n", "Non-", gsub("-", "\n", split))), 
+                height=unit(1,"strheight",  gsub("Non\n", "Non-", gsub("-", "\n", split))))
     grid.text(gsub("Non\n", "Non-", gsub("-", "\n", split)), just = "center", gp=gpar(fontsize=fontsize-2))
+    }
   }
 }
 class(edge_simple) <- "grapcon_generator"
